@@ -34,7 +34,7 @@ jobs:
         audience: api://AzureADTokenExchange
         enable-AzPSSession: true
         environment: azurecloud
-        allow-no-subscriptions: false
+        allow-no-subscriptions: true
 
     - name: Set Azure Subscription
       run: |
