@@ -35,7 +35,7 @@ jobs:
         audience: api://AzureADTokenExchange
         enable-AzPSSession: True
         environment: azurecloud
-        allow-no-subscriptions: True
+        allow-no-subscriptions: false
 
     - name: Create Resource Group
       run: |
