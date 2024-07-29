@@ -12,10 +12,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Set up Azure CLI
-      uses: azure/cli@v1
+    - name:  Set up Python
+      uses: actions/setup-python@v2
       with:
-        azcliversion: 2.0.72
+        python-version: '3.x'
+
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        az --version
+
+    - name: Set Azure Cloud Environment
+      run: |
+        az cloud set --name AzureCloud
 
     - name: Azure Login
       uses: azure/login@v1
