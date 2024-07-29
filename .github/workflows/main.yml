@@ -32,7 +32,7 @@ jobs:
         client-id: 9135a6c7-13df-4d13-b920-1da66af6b27e
         tenant-id: 6a2e5dc4-b83f-4fe6-9dd5-616bf3f0aa34
         audience: api://AzureADTokenExchange
-        enable-AzPSSession: false
+        enable-AzPSSession: True
         environment: azurecloud
         allow-no-subscriptions: True
 
