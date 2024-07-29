@@ -1,0 +1,44 @@
+name: JMeter Load Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  jmeter:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Azure CLI
+      uses: azure/cli@v1
+      with:
+        azcliversion: 2.0.72
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Create Resource Group
+      run: |
+        az group create --name myResourceGroup --location eastus
+
+    - name: Create AKS Cluster
+      run: |
+        az aks create --resource-group myResourceGroup --name myAKSCluster --node-count 3 --enable-addons monitoring --generate-ssh-keys
+
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials --resource-group myResourceGroup --name myAKSCluster
+
+    - name: Deploy JMeter Master and Slaves
+      run: |
+        kubectl apply -f jmeter-master-deployment.yaml
+        kubectl apply -f jmeter-slave-deployment.yaml
+
+    - name: Trigger JMeter Test
+      run: |
+        kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.3/bin/jmeter -n -t /opt/apache-jmeter-5.3/Demo.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
