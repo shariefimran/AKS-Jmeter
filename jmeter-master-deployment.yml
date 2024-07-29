@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmeter-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmeter
+      role: master
+  template:
+    metadata:
+      labels:
+        app: jmeter
+        role: master
+    spec:
+      containers:
+      - name: jmeter-master
+        image: justb4/jmeter:latest
+        ports:
+        - containerPort: 60000
