@@ -5,10 +5,10 @@ on:
     branches:
       - main
 
-
 permissions:
-      id-token: write
-      contents: read
+  id-token: write
+  contents: read
+
 jobs:
   jmeter:
     runs-on: ubuntu-latest
@@ -26,13 +26,23 @@ jobs:
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
         az --version
 
+    - name: Set Azure Cloud Environment
+      run: |
+        az cloud set --name AzureCloud
+
     - name: Azure Login
       uses: azure/login@v1
       with:
         client-id: 9135a6c7-13df-4d13-b920-1da66af6b27e
-        clientSecret: a05720b5-3892-4afc-922c-ce20d3ff5375
         tenant-id: 6a2e5dc4-b83f-4fe6-9dd5-616bf3f0aa34
-        subscription-id: f246b020-dc38-4d48-93ee-e968a8c961dd
+        audience: api://AzureADTokenExchange
+        enable-AzPSSession: true
+        environment: azurecloud
+        allow-no-subscriptions: false
+
+    - name: Set Azure Subscription
+      run: |
+        az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Create Resource Group
       run: |
