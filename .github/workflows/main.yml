@@ -94,6 +94,10 @@ jobs:
     - name: Wait for JMeter Slave Pods to be Ready
       run: |
         kubectl wait --for=condition=ready pod -l "app=jmeter,role=slave" --timeout=300s
+    
+    - name: Verify JMeter Installation
+      run: |
+        kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash -c "ls -l /opt/apache-jmeter-5.3/bin/"
 
     - name: Trigger JMeter Test
       run: |
