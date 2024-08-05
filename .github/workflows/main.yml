@@ -71,4 +71,4 @@ jobs:
 
     - name: Trigger JMeter Test
       run: |
-        kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.3/bin/jmeter -n -t /opt/apache-jmeter-5.3/test-plan.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
+        kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.3/bin/jmeter -n -t /opt/apache-jmeter-5.3/Demo.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
