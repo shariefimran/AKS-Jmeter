@@ -66,8 +66,8 @@ jobs:
 
     - name: Deploy JMeter Master and Slaves
       run: |
-        kubectl apply -f jmeter-master-deployment.yaml
-        kubectl apply -f jmeter-slave-deployment.yaml
+        kubectl apply -f jmeter-master-deployment.yml
+        kubectl apply -f jmeter-slave-deployment.yml
 
     - name: Trigger JMeter Test
       run: |
