@@ -58,7 +58,7 @@ jobs:
 
     - name: Create AKS Cluster
       run: |
-        az aks create --resource-group myResourceGroup --name myAKSCluster --node-count 3 --enable-addons monitoring --generate-ssh-keys
+        az aks create --resource-group myResourceGroup --name myAKSCluster1 --node-count 3 --enable-addons monitoring --generate-ssh-keys
 
     - name: Get AKS Credentials
       run: |
@@ -106,4 +106,4 @@ jobs:
 
     - name: Trigger JMeter Test
       run: |
-        kubectl exec $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.4/bin/jmeter -n -t /opt/apache-jmeter-5.4/Demo.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
+        kubectl exec $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.5/bin/jmeter -n -t /opt/apache-jmeter-5.5/Demo.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
