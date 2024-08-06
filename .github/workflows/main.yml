@@ -43,22 +43,22 @@ jobs:
 
     - name: Register Microsoft.Insights namespace
       run: |
-        az provider register --namespace microsoft.insights
+        az provider register --namespace microsoft.insights1
 
     - name: Wait for namespace registration
       run: |
-        while [ $(az provider show --namespace microsoft.insights --query "registrationState" -o tsv) != "Registered" ]; do
+        while [ $(az provider show --namespace microsoft.insights1 --query "registrationState" -o tsv) != "Registered" ]; do
           echo "Waiting for microsoft.insights namespace registration..."
           sleep 10
         done
 
     - name: Create Resource Group
       run: |
-        az group create --name myResourceGroup --location eastus
+        az group create --name myResourceGroup1 --location eastus
 
     - name: Create AKS Cluster
       run: |
-        az aks create --resource-group myResourceGroup --name myAKSCluster1 --node-count 3 --enable-addons monitoring --generate-ssh-keys
+        az aks create --resource-group myResourceGroup1 --name myAKSCluster1 --node-count 3 --enable-addons monitoring --generate-ssh-keys
 
     - name: Get AKS Credentials
       run: |
