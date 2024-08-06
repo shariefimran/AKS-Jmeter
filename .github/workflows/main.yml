@@ -43,11 +43,11 @@ jobs:
 
     - name: Register Microsoft.Insights namespace
       run: |
-        az provider register --namespace microsoft.insights1
+        az provider register --namespace microsoft.insights
 
     - name: Wait for namespace registration
       run: |
-        while [ $(az provider show --namespace microsoft.insights1 --query "registrationState" -o tsv) != "Registered" ]; do
+        while [ $(az provider show --namespace microsoft.insights --query "registrationState" -o tsv) != "Registered" ]; do
           echo "Waiting for microsoft.insights namespace registration..."
           sleep 10
         done
