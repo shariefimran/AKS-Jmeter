@@ -71,22 +71,39 @@ jobs:
 
     - name: Create JMeter Master Pod
       run: |
-        kubectl run jmeter-master --image=justb4/jmeter --restart=Never --labels=app=jmeter,role=master --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 30; done;"
+        kubectl run jmeter-master --image=justb4/jmeter --restart=Never --labels=app=jmeter,role=master --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 300; done;"
 
     - name: Create JMeter Slave Pods
       run: |
         for i in {1..3}; do
-          kubectl run jmeter-slave-$i --image=justb4/jmeter --restart=Never --labels=app=jmeter,role=slave --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 30; done;"
+          kubectl run jmeter-slave-$i --image=justb4/jmeter --restart=Never --labels=app=jmeter,role=slave --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 300; done;"
         done
 
     - name: Wait for JMeter Master Pod to be Ready
       run: |
         kubectl wait --for=condition=ready pod -l "app=jmeter,role=master" --timeout=300s
 
+    - name: Check JMeter Master Pod Status
+      if: failure()
+      run: |
+        kubectl get pod -l "app=jmeter,role=master" -o wide
+        kubectl describe pod -l "app=jmeter,role=master"
+        kubectl logs $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}")
+
     - name: Wait for JMeter Slave Pods to be Ready
       run: |
         kubectl wait --for=condition=ready pod -l "app=jmeter,role=slave" --timeout=300s
 
+    - name: Check JMeter Slave Pods Status
+      if: failure()
+      run: |
+        kubectl get pod -l "app=jmeter,role=slave" -o wide
+        kubectl describe pod -l "app=jmeter,role=slave"
+        for pod in $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].metadata.name}"); do
+          echo "Logs for $pod:"
+          kubectl logs $pod;
+        done
+
     - name: Trigger JMeter Test
       run: |
-        kubectl exec $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.3/bin/jmeter -n -t /opt/apache-jmeter-5.3/Demo.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
+        kubectl exec $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash /opt/apache-jmeter-5.3/bin/jmeter -n -t /opt/apache-jmeter-5.3/test-plan.jmx -R $(kubectl get pods -l "app=jmeter,role=slave" -o jsonpath="{.items[*].status.podIP}" | sed 's/ /,/g')
