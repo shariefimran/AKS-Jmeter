@@ -58,7 +58,7 @@ jobs:
 
     - name: Create AKS Cluster
       run: |
-        az aks create --resource-group myResourceGroup1 --name myAKSCluster1 --node-count 3 --enable-addons monitoring --generate-ssh-keys
+        az aks create --resource-group myResourceGroup1 --name myAKSCluster1 --node-count 3  --generate-ssh-keys
 
     - name: Get AKS Credentials
       run: |
