@@ -69,23 +69,15 @@ jobs:
       with:
         version: 'latest'
 
-    - name: Create a Test Pod
+    - name: Create JMeter Master Pod
       run: |
-        cat <<EOF | kubectl apply -f -
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          name: test-pod
-        spec:
-          containers:
-          - name: test-container
-            image: nginx
-        EOF
+        kubectl run jmeter-master --image=justb4/jmeter:5.4.1 --restart=Never --labels=app=jmeter,role=master --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 30; done;"
 
-    - name: Deploy JMeter Master and Slaves
+    - name: Create JMeter Slave Pods
       run: |
-        kubectl apply -f jmeter-master-deployment.yaml
-        kubectl apply -f jmeter-slave-deployment.yaml
+        for i in {1..3}; do
+          kubectl run jmeter-slave-$i --image=justb4/jmeter:5.4.1 --restart=Never --labels=app=jmeter,role=slave --env="JAVA_OPTS=-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote=false" -- /bin/bash -c "while true; do sleep 30; done;"
+        done
 
     - name: Wait for JMeter Master Pod to be Ready
       run: |
@@ -94,10 +86,6 @@ jobs:
     - name: Wait for JMeter Slave Pods to be Ready
       run: |
         kubectl wait --for=condition=ready pod -l "app=jmeter,role=slave" --timeout=300s
-
-    - name: Verify JMeter Installation
-      run: |
-        kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash -c "ls -l /opt/apache-jmeter-5.3/bin/"
 
     - name: Trigger JMeter Test
       run: |
