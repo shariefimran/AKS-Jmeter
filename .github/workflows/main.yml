@@ -84,8 +84,8 @@ jobs:
 
     - name: Deploy JMeter Master and Slaves
       run: |
-        kubectl apply -f jmeter-master-deployment.yml
-        kubectl apply -f jmeter-slave-deployment.yml
+        kubectl apply -f jmeter-master-deployment.yaml
+        kubectl apply -f jmeter-slave-deployment.yaml
 
     - name: Wait for JMeter Master Pod to be Ready
       run: |
@@ -94,7 +94,7 @@ jobs:
     - name: Wait for JMeter Slave Pods to be Ready
       run: |
         kubectl wait --for=condition=ready pod -l "app=jmeter,role=slave" --timeout=300s
-    
+
     - name: Verify JMeter Installation
       run: |
         kubectl exec -it $(kubectl get pods -l "app=jmeter,role=master" -o jsonpath="{.items[0].metadata.name}") -- /bin/bash -c "ls -l /opt/apache-jmeter-5.3/bin/"
